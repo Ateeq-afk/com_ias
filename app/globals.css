@@ -2,26 +2,625 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Apple-style CSS Variables */
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  /* Colors - Apple Design System */
+  --apple-blue: #007AFF;
+  --apple-blue-dark: #0051D5;
+  --apple-purple: #5856D6;
+  --apple-pink: #FF2D55;
+  --apple-orange: #FF9500;
+  --apple-yellow: #FFCC00;
+  --apple-green: #34C759;
+  --apple-teal: #5AC8FA;
+  --apple-indigo: #5856D6;
+  --apple-red: #FF3B30;
+  
+  /* Grays - Apple System */
+  --apple-gray-1: #8E8E93;
+  --apple-gray-2: #C7C7CC;
+  --apple-gray-3: #D1D1D6;
+  --apple-gray-4: #E5E5EA;
+  --apple-gray-5: #F2F2F7;
+  --apple-gray-6: #FFFFFF;
+  
+  /* Text Colors */
+  --apple-text-primary: rgba(0, 0, 0, 1);
+  --apple-text-secondary: rgba(60, 60, 67, 0.6);
+  --apple-text-tertiary: rgba(60, 60, 67, 0.3);
+  --apple-text-quaternary: rgba(60, 60, 67, 0.18);
+  
+  /* Backgrounds */
+  --apple-bg-primary: #FFFFFF;
+  --apple-bg-secondary: #F2F2F7;
+  --apple-bg-tertiary: #FFFFFF;
+  --apple-bg-elevated: #FFFFFF;
+  --apple-bg-grouped: #F2F2F7;
+  
+  /* Effects */
+  --apple-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --apple-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --apple-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --apple-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  /* Materials */
+  --apple-material-thin: rgba(255, 255, 255, 0.55);
+  --apple-material-regular: rgba(255, 255, 255, 0.75);
+  --apple-material-thick: rgba(255, 255, 255, 0.85);
+  --apple-material-chrome: rgba(255, 255, 255, 0.95);
+  
+  /* Blur */
+  --apple-blur-sm: 8px;
+  --apple-blur-md: 20px;
+  --apple-blur-lg: 40px;
+  --apple-blur-xl: 80px;
+  
+  /* Border Radius */
+  --apple-radius-xs: 6px;
+  --apple-radius-sm: 8px;
+  --apple-radius-md: 12px;
+  --apple-radius-lg: 16px;
+  --apple-radius-xl: 20px;
+  --apple-radius-2xl: 24px;
+  --apple-radius-full: 9999px;
+  
+  /* Transitions */
+  --apple-ease-in-out: cubic-bezier(0.42, 0, 0.58, 1);
+  --apple-ease-out: cubic-bezier(0.19, 1, 0.22, 1);
+  --apple-spring: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
+/* Force Light Mode - Override all dark mode styles */
 @media (prefers-color-scheme: dark) {
   :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    /* Force light mode colors even in dark mode */
+    --apple-text-primary: rgba(0, 0, 0, 0.87);
+    --apple-text-secondary: rgba(0, 0, 0, 0.6);
+    --apple-text-tertiary: rgba(0, 0, 0, 0.38);
+    --apple-text-quaternary: rgba(0, 0, 0, 0.12);
+    
+    --apple-bg-primary: #FAFAFA;
+    --apple-bg-secondary: #F5F5F5;
+    --apple-bg-tertiary: #FFFFFF;
+    --apple-bg-elevated: #FFFFFF;
+    --apple-bg-grouped: #F5F5F5;
+    
+    --apple-material-thin: rgba(255, 255, 255, 0.8);
+    --apple-material-regular: rgba(255, 255, 255, 0.9);
+    --apple-material-thick: rgba(255, 255, 255, 0.95);
+    --apple-material-chrome: rgba(255, 255, 255, 0.98);
   }
 }
 
+/* Force Light Mode - Override Tailwind dark classes */
+.dark * {
+  color-scheme: light !important;
+}
+
+/* Global light mode override */
+html, body {
+  color-scheme: light !important;
+  background-color: #FAFAFA !important;
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+/* Base Styles */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 17px;
+}
+
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: var(--apple-text-primary);
+  background-color: var(--apple-bg-primary);
+  line-height: 1.47059;
+  letter-spacing: -0.022em;
+  font-weight: 400;
+  margin: 0;
+  padding: 0;
+}
+
+/* Typography Scale - Apple Style */
+.apple-hero {
+  font-size: 80px;
+  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+@media (max-width: 768px) {
+  .apple-hero {
+    font-size: 48px;
+  }
+}
+
+.apple-display {
+  font-size: 64px;
+  line-height: 1.08;
+  font-weight: 700;
+  letter-spacing: -0.003em;
+}
+
+.apple-title-1 {
+  font-size: 48px;
+  line-height: 1.08;
+  font-weight: 700;
+  letter-spacing: -0.003em;
+}
+
+.apple-title-2 {
+  font-size: 40px;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.apple-title-3 {
+  font-size: 32px;
+  line-height: 1.125;
+  font-weight: 600;
+  letter-spacing: 0.004em;
+}
+
+.apple-headline {
+  font-size: 24px;
+  line-height: 1.16667;
+  font-weight: 600;
+  letter-spacing: 0.009em;
+}
+
+.apple-body-large {
+  font-size: 19px;
+  line-height: 1.4211;
+  font-weight: 400;
+  letter-spacing: 0.012em;
+}
+
+.apple-body {
+  font-size: 17px;
+  line-height: 1.47059;
+  font-weight: 400;
+  letter-spacing: -0.022em;
+}
+
+.apple-callout {
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 400;
+  letter-spacing: -0.011em;
+}
+
+.apple-subheadline {
+  font-size: 15px;
+  line-height: 1.33333;
+  font-weight: 400;
+  letter-spacing: -0.008em;
+}
+
+.apple-footnote {
+  font-size: 13px;
+  line-height: 1.38462;
+  font-weight: 400;
+  letter-spacing: -0.005em;
+}
+
+.apple-caption {
+  font-size: 12px;
+  line-height: 1.33333;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/* Components */
+@layer components {
+  /* Apple Glass Effect */
+  .apple-glass {
+    background: var(--apple-material-regular);
+    backdrop-filter: saturate(180%) blur(var(--apple-blur-md));
+    -webkit-backdrop-filter: saturate(180%) blur(var(--apple-blur-md));
+  }
+  
+  .apple-glass-thick {
+    background: var(--apple-material-thick);
+    backdrop-filter: saturate(180%) blur(var(--apple-blur-lg));
+    -webkit-backdrop-filter: saturate(180%) blur(var(--apple-blur-lg));
+  }
+  
+  /* Apple Buttons */
+  .apple-button {
+    @apply inline-flex items-center justify-center px-5 py-2.5 text-[17px] font-normal leading-tight tracking-[-0.022em] rounded-full transition-all duration-200 ease-out cursor-pointer relative overflow-hidden;
+    background: var(--apple-blue);
+    color: white;
+    border: none;
+    outline: none;
+  }
+  
+  .apple-button:hover {
+    background: var(--apple-blue-dark);
+    transform: scale(1.015);
+  }
+  
+  .apple-button:active {
+    transform: scale(0.985);
+  }
+  
+  .apple-button-secondary {
+    @apply apple-button;
+    background: var(--apple-bg-secondary);
+    color: var(--apple-text-primary);
+  }
+  
+  .apple-button-secondary:hover {
+    background: var(--apple-gray-3);
+  }
+  
+  .apple-button-ghost {
+    @apply apple-button;
+    background: transparent;
+    color: var(--apple-blue);
+    box-shadow: inset 0 0 0 1px var(--apple-blue);
+  }
+  
+  .apple-button-ghost:hover {
+    background: var(--apple-blue);
+    color: white;
+  }
+  
+  /* Apple Cards */
+  .apple-card {
+    @apply rounded-2xl overflow-hidden transition-all duration-300 ease-out;
+    background: var(--apple-bg-elevated);
+    box-shadow: var(--apple-shadow-md);
+  }
+  
+  .apple-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--apple-shadow-xl);
+  }
+  
+  .apple-card-glass {
+    @apply apple-card apple-glass;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Apple Navigation Bar */
+  .apple-nav {
+    background: var(--apple-material-chrome);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 0.5px solid var(--apple-text-quaternary);
+  }
+  
+  /* Apple Sidebar */
+  .apple-sidebar {
+    background: var(--apple-bg-secondary);
+    border-right: 0.5px solid var(--apple-text-quaternary);
+  }
+  
+  /* Apple List Items */
+  .apple-list-item {
+    @apply flex items-center px-4 py-3 rounded-lg transition-all duration-150 ease-out cursor-pointer;
+  }
+  
+  .apple-list-item:hover {
+    background: var(--apple-material-regular);
+  }
+  
+  .apple-list-item:active {
+    transform: scale(0.98);
+  }
+  
+  /* Apple Input */
+  .apple-input {
+    @apply w-full px-4 py-3 text-[17px] rounded-xl border transition-all duration-200 ease-out;
+    background: var(--apple-bg-secondary);
+    border-color: var(--apple-text-quaternary);
+    color: var(--apple-text-primary);
+  }
+  
+  .apple-input:focus {
+    outline: none;
+    border-color: var(--apple-blue);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+  }
+  
+  /* Apple Toggle */
+  .apple-toggle {
+    @apply relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-200 ease-out cursor-pointer;
+    background: var(--apple-gray-3);
+  }
+  
+  .apple-toggle.active {
+    background: var(--apple-green);
+  }
+  
+  .apple-toggle-thumb {
+    @apply absolute left-0.5 h-6 w-6 rounded-full bg-white transition-transform duration-200 ease-out;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .apple-toggle.active .apple-toggle-thumb {
+    transform: translateX(20px);
+  }
+}
+
+/* Animations */
+@keyframes apple-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes apple-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes apple-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes apple-glow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.apple-animate-in {
+  animation: apple-fade-in 0.7s var(--apple-ease-out) both;
+}
+
+.apple-animate-scale {
+  animation: apple-scale-in 0.7s var(--apple-ease-out) both;
+}
+
+.apple-animate-slide {
+  animation: apple-slide-up 0.7s var(--apple-ease-out) both;
+}
+
+.apple-animate-glow {
+  animation: apple-glow 2s ease-in-out infinite;
+}
+
+/* Custom Scrollbar - Apple Style */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--apple-text-tertiary);
+  border-radius: 100px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--apple-text-secondary);
+  background-clip: padding-box;
+}
+
+/* Focus Styles */
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--apple-blue);
+  outline-offset: 2px;
+  border-radius: var(--apple-radius-sm);
+}
+
+/* Selection */
+::selection {
+  background-color: var(--apple-blue);
+  color: white;
+}
+
+/* Utilities */
+@layer utilities {
+  .apple-text-gradient {
+    background: linear-gradient(135deg, var(--apple-blue) 0%, var(--apple-purple) 50%, var(--apple-pink) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .apple-gradient-blue {
+    background: linear-gradient(135deg, #007AFF 0%, #005BB5 100%);
+  }
+  
+  .apple-gradient-purple {
+    background: linear-gradient(135deg, #5856D6 0%, #3634A3 100%);
+  }
+  
+  .apple-gradient-pink {
+    background: linear-gradient(135deg, #FF2D55 0%, #D70015 100%);
+  }
+  
+  .apple-gradient-orange {
+    background: linear-gradient(135deg, #FF9500 0%, #FF6200 100%);
+  }
+  
+  .apple-gradient-green {
+    background: linear-gradient(135deg, #34C759 0%, #248A3D 100%);
+  }
+}
+
+/* Beautiful Subtle Light Theme Overrides */
+.bg-gray-50 {
+  background-color: #FAFAFA !important;
+}
+
+.bg-gray-900 {
+  background-color: #FFFFFF !important;
+}
+
+.dark\:bg-gray-900 {
+  background-color: #FFFFFF !important;
+}
+
+.dark\:bg-gray-800 {
+  background-color: #F5F5F5 !important;
+}
+
+.dark\:text-white {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.dark\:text-gray-400 {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.dark\:text-gray-300 {
+  color: rgba(0, 0, 0, 0.7) !important;
+}
+
+.dark\:border-gray-800 {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+.dark\:border-gray-700 {
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+.border-gray-200 {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+.text-gray-900 {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.text-gray-600 {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.text-gray-800 {
+  color: rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Subtle shadows and modern feel */
+.apple-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+  border: 1px solid rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Beautiful gradient backgrounds */
+.hero-gradient {
+  background: linear-gradient(135deg, #FAFAFA 0%, #F0F4F8 50%, #E6FFFA 100%) !important;
+}
+
+/* Comprehensive dark mode overrides for all classes */
+.dark\:hover\:text-white:hover {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.dark\:hover\:text-gray-900:hover {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.dark\:border-gray-700 {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Additional comprehensive overrides */
+.bg-gray-900,
+.dark\:bg-gray-900,
+*[class*="dark:bg-gray-900"] {
+  background-color: #FFFFFF !important;
+}
+
+.bg-gray-800,
+.dark\:bg-gray-800,
+*[class*="dark:bg-gray-800"] {
+  background-color: #F8F9FA !important;
+}
+
+.text-white,
+.dark\:text-white,
+*[class*="dark:text-white"] {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.text-gray-400,
+.dark\:text-gray-400,
+*[class*="dark:text-gray-400"] {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.text-gray-300,
+.dark\:text-gray-300,
+*[class*="dark:text-gray-300"] {
+  color: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Force override any remaining dark classes */
+[class*="dark:"]:not([class*="dark:border"]):not([class*="dark:hover"]) {
+  background-color: #FFFFFF !important;
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+/* Specific footer styling */
+footer {
+  background-color: #F8F9FA !important;
+}
+
+/* Force light mode on all elements */
+html.dark,
+html[data-theme="dark"],
+.dark {
+  background-color: #FAFAFA !important;
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.dark *,
+html.dark *,
+html[data-theme="dark"] * {
+  color: inherit !important;
+}
+
+/* Override system dark mode completely */
+@media (prefers-color-scheme: dark) {
+  * {
+    background-color: inherit !important;
+    color: inherit !important;
+  }
+  
+  body {
+    background-color: #FAFAFA !important;
+    color: rgba(0, 0, 0, 0.87) !important;
+  }
 }

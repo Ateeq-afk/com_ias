@@ -1,0 +1,341 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Authentication & Profile
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  name            String?
+  password        String?
+  image           String?
+  role            UserRole  @default(STUDENT)
+  emailVerified   DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  accounts        Account[]
+  sessions        Session[]
+  subscription    Subscription?
+  profile         UserProfile?
+  enrollments     Enrollment[]
+  testAttempts    TestAttempt[]
+  progress        Progress[]
+  payments        Payment[]
+  notifications   Notification[]
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserProfile {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  phone             String?
+  dateOfBirth       DateTime?
+  state             String?
+  aspirationType    String?  // UPSC, State PSC, etc.
+  targetYear        Int?
+  preferredLanguage String   @default("en")
+  studyHoursGoal    Int      @default(4) // Daily study hours goal
+  streakCount       Int      @default(0)
+  totalStudyTime    Int      @default(0) // in minutes
+  lastActiveAt      DateTime @default(now())
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Subscription & Payment
+model Subscription {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  plan             Plan
+  status           SubscriptionStatus
+  startDate        DateTime @default(now())
+  endDate          DateTime
+  autoRenew        Boolean  @default(true)
+  stripeCustomerId String?
+  razorpayCustomerId String?
+  
+  user User @relation(fields: [userId], references: [id])
+  payments Payment[]
+}
+
+model Payment {
+  id                String   @id @default(cuid())
+  userId            String
+  subscriptionId    String?
+  amount            Float
+  currency          String   @default("INR")
+  status            PaymentStatus
+  method            String   // stripe, razorpay, etc.
+  transactionId     String?  @unique
+  failureReason     String?
+  createdAt         DateTime @default(now())
+  
+  user         User          @relation(fields: [userId], references: [id])
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
+}
+
+// Course Content
+model Subject {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  icon        String?
+  color       String?
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  
+  modules     Module[]
+}
+
+model Module {
+  id          String   @id @default(cuid())
+  subjectId   String
+  name        String
+  slug        String
+  description String?
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  
+  subject     Subject  @relation(fields: [subjectId], references: [id])
+  lessons     Lesson[]
+  tests       Test[]
+}
+
+model Lesson {
+  id              String   @id @default(cuid())
+  moduleId        String
+  title           String
+  slug            String
+  description     String?
+  content         Json     // Structured content with interactive elements
+  estimatedTime   Int      // in minutes
+  difficulty      Difficulty
+  order           Int      @default(0)
+  isPublished     Boolean  @default(false)
+  isFree          Boolean  @default(false)
+  prerequisites   String[] // Array of lesson IDs
+  tags            String[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  module          Module   @relation(fields: [moduleId], references: [id])
+  enrollments     Enrollment[]
+  progress        Progress[]
+}
+
+// Testing System
+model Test {
+  id              String   @id @default(cuid())
+  moduleId        String?
+  title           String
+  slug            String
+  description     String?
+  type            TestType // PRACTICE, MOCK, SUBJECT, FULL_LENGTH
+  duration        Int      // in minutes
+  totalQuestions  Int
+  totalMarks      Int
+  negativeMarking Float    @default(0.33)
+  passingMarks    Int?
+  difficulty      Difficulty
+  isPublished     Boolean  @default(false)
+  isFree          Boolean  @default(false)
+  instructions    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  module          Module?  @relation(fields: [moduleId], references: [id])
+  questions       Question[]
+  attempts        TestAttempt[]
+}
+
+model Question {
+  id              String   @id @default(cuid())
+  testId          String
+  type            QuestionType // MCQ, MULTIPLE_SELECT, DESCRIPTIVE
+  question        String
+  options         Json?    // For MCQ type questions
+  correctAnswer   Json     // Can be string or array for multiple select
+  explanation     String?
+  marks           Int      @default(1)
+  negativeMarks   Float    @default(0.33)
+  difficulty      Difficulty
+  tags            String[]
+  order           Int      @default(0)
+  
+  test            Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
+  responses       TestResponse[]
+}
+
+model TestAttempt {
+  id              String   @id @default(cuid())
+  userId          String
+  testId          String
+  startedAt       DateTime @default(now())
+  submittedAt     DateTime?
+  timeSpent       Int?     // in seconds
+  score           Float?
+  percentage      Float?
+  rank            Int?
+  status          TestStatus
+  
+  user            User     @relation(fields: [userId], references: [id])
+  test            Test     @relation(fields: [testId], references: [id])
+  responses       TestResponse[]
+}
+
+model TestResponse {
+  id              String   @id @default(cuid())
+  attemptId       String
+  questionId      String
+  answer          Json?
+  isCorrect       Boolean?
+  marksObtained   Float?
+  timeSpent       Int?     // in seconds
+  
+  attempt         TestAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question        Question    @relation(fields: [questionId], references: [id])
+  
+  @@unique([attemptId, questionId])
+}
+
+// Progress Tracking
+model Enrollment {
+  id              String   @id @default(cuid())
+  userId          String
+  lessonId        String
+  enrolledAt      DateTime @default(now())
+  completedAt     DateTime?
+  
+  user            User     @relation(fields: [userId], references: [id])
+  lesson          Lesson   @relation(fields: [lessonId], references: [id])
+  
+  @@unique([userId, lessonId])
+}
+
+model Progress {
+  id              String   @id @default(cuid())
+  userId          String
+  lessonId        String
+  sectionId       String   // Section within the lesson
+  completed       Boolean  @default(false)
+  timeSpent       Int      @default(0) // in seconds
+  lastAccessedAt  DateTime @default(now())
+  
+  user            User     @relation(fields: [userId], references: [id])
+  lesson          Lesson   @relation(fields: [lessonId], references: [id])
+  
+  @@unique([userId, lessonId, sectionId])
+}
+
+// Notifications
+model Notification {
+  id              String   @id @default(cuid())
+  userId          String
+  title           String
+  message         String
+  type            NotificationType
+  isRead          Boolean  @default(false)
+  metadata        Json?
+  createdAt       DateTime @default(now())
+  
+  user            User     @relation(fields: [userId], references: [id])
+}
+
+// Enums
+enum UserRole {
+  STUDENT
+  INSTRUCTOR
+  ADMIN
+}
+
+enum Plan {
+  FREE
+  MONTHLY
+  QUARTERLY
+  YEARLY
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  CANCELLED
+  EXPIRED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum TestType {
+  PRACTICE
+  MOCK
+  SUBJECT
+  FULL_LENGTH
+}
+
+enum QuestionType {
+  MCQ
+  MULTIPLE_SELECT
+  DESCRIPTIVE
+}
+
+enum TestStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  SUBMITTED
+  EXPIRED
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+  ACHIEVEMENT
+}
